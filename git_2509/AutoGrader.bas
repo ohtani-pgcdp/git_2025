@@ -1,14 +1,25 @@
-Attribute VB_Name = "AutoGrader"
+Attribute VB_Name = "最終課題"
 Option Explicit
 
-'単一ブック(60シート)の採点フォント整備済み
-'   フォント、単一ブックに対する処理は問題なし。次は複数ブック対応へ
+Sub AutoGrader()
 
-Sub ProcessScoreForSheet()
-   Dim answer As Range, correct As Range, cC As Double, _
-   i As Long, a As Long, rate As Double, wb As Workbook
+    Dim answer As Range, correct As Range, cC As Double, _
+    i As Long, a As Long, rate As Double, wb As Workbook, _
+    aB As String, tB As String
+   
+    aB = InputBox("解答一覧が書かれたファイルのフルパスを入力してください。")
+    aB = Left(aB, Len(aB) - 1)
+    aB = Right(aB, Len(aB) - 1)
     
-    Workbooks("01.Excelの基本操作_全60問.xlsx").Activate
+    tB = InputBox("採点するファイルのフルパスを入力してください。")
+    tB = Left(tB, Len(tB) - 1)
+    tB = Right(tB, Len(tB) - 1)
+    
+    
+    Workbooks.Open fileName:=aB
+    aB = ActiveWorkbook.Name
+    
+    Workbooks.Open fileName:=tB
     
     
     '採点用シートを作成・挿入↓
@@ -30,14 +41,15 @@ Sub ProcessScoreForSheet()
     
     For i = 2 To 61
         '解答を保持
-        Set answer = Workbooks("01.Excelの基本操作_全60問.xlsx").Sheets(i).Cells(20, 1) '生徒が提出したファイル
+        tB = ActiveWorkbook.Name
+        Set answer = Workbooks(tB).Sheets(i).Cells(20, 1) '生徒が提出したファイル
         
         '正答を保持
-        Workbooks("解答集(最終課題用).xlsx").Sheets(1).Activate '解答が書かれたファイル
+        Workbooks(aB).Sheets(1).Activate '解答が書かれたファイル
         Set correct = Sheets(1).Cells(i - 1, 2)
         
         '元のブックに戻って採点開始
-        Workbooks("01.Excelの基本操作_全60問.xlsx").Activate
+        Workbooks(tB).Activate
         Cells(i, 2).Value = answer
         Cells(i, 3).Value = correct
         
@@ -85,8 +97,7 @@ Sub ProcessScoreForSheet()
     Range("C62:D62").Borders(xlEdgeRight).Weight = xlMedium
     Cells(62, 3).Borders(xlEdgeRight).LineStyle = xlContinuous
     
-    '保存して閉じる
-'    Set wb = Workbooks("01.Excelの基本操作_全60問.xlsx")
+'    保存して閉じる
+'    Set wb = Workbooks(tB)
 '    wb.Close savechanges:=True
-    
 End Sub
